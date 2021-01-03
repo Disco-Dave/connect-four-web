@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:connect-four-web"
+
+    - path: "app/Main.hs"
+      component: "connect-four-web:exe:connect-four-web"
+
+    - path: "test"
+      component: "connect-four-web:test:connect-four-web-test"
