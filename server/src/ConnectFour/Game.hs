@@ -13,6 +13,7 @@ import ConnectFour.Game.Board (Board, Column (..), Disc (..), Row (..))
 import qualified ConnectFour.Game.Board as Board
 import ConnectFour.Game.ColumnStack (oppositeDisc)
 import Data.Aeson (ToJSON)
+import Data.List (nub)
 import Data.Maybe (listToMaybe, mapMaybe)
 import GHC.Generics (Generic)
 
@@ -65,24 +66,26 @@ rangesToCheck =
   let verticals =
         mconcat
           [ chunkBy4 $ (column,) <$> enumFrom Row1
-          | column <- enumFrom Column1
+          | column <- [Column1 ..]
           ]
       horizontals =
         mconcat
           [ chunkBy4 $ (,row) <$> enumFrom Column1
-          | row <- enumFrom Row1
+          | row <- [Row1 ..]
           ]
-      diagonals =
-        mconcat
-          [ chunkBy4 $ zip [column ..] [Row1 ..]
-          | column <- enumFrom Column1
+      forwardDiagonals =
+        nub . mconcat $
+          [ chunkBy4 $ zip [column ..] [row ..]
+          | row <- [Row1 ..]
+          , column <- [Column1 ..]
           ]
-      diagonals2 =
-        mconcat
-          [ chunkBy4 $ zip [column, pred column ..] [Row1 ..]
-          | column <- enumFrom Column2
+      backwardsDiagonals =
+        nub . mconcat $
+          [ chunkBy4 $ zip [column, pred column ..] [row ..]
+          | column <- [Column2 ..]
+          , row <- [Row1 ..]
           ]
-   in verticals <> horizontals <> diagonals <> diagonals2
+   in verticals <> horizontals <> forwardDiagonals <> backwardsDiagonals
 
 findWinner :: Board -> Maybe Disc
 findWinner board' =
