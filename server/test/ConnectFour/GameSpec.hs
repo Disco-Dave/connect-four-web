@@ -1296,4 +1296,257 @@ spec = do
             ]
 
         describe "can detect backward diagonal wins" $
-          expectWins []
+          expectWins
+            [
+              ( RedDisc
+              , (RedDisc, Column7)
+              ,
+                [ (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column1)
+              ,
+                [ (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column4)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column7)
+              ,
+                [ (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column4)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column6)
+              ,
+                [ (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column3)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column1)
+              ,
+                [ (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column6)
+              ,
+                [ (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column5)
+              ,
+                [ (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column3)
+              ,
+                [ (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column2)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column5)
+              ,
+                [ (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column4)
+              ,
+                [ (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column1)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column1)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column3)
+              ,
+                [ (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column1)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column1)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column1)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column4)
+              ,
+                [ (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column2)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column1)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column1)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column1)
+                ]
+              )
+            ]
