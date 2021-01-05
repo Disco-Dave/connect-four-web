@@ -1203,6 +1203,96 @@ spec = do
                 , (RedDisc, Column6)
                 ]
               )
+            ,
+              ( RedDisc
+              , (RedDisc, Column3)
+              ,
+                [ (YellowDisc, Column3)
+                , (RedDisc, Column3)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column6)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column4)
+              ,
+                [ (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column3)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column1)
+              ,
+                [ (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column4)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column7)
+                ]
+              )
+            ,
+              ( RedDisc
+              , (RedDisc, Column4)
+              ,
+                [ (YellowDisc, Column4)
+                , (RedDisc, Column4)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column5)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column1)
+                , (RedDisc, Column5)
+                , (YellowDisc, Column2)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column6)
+                , (RedDisc, Column6)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                , (YellowDisc, Column7)
+                , (RedDisc, Column7)
+                ]
+              )
             ]
 
         describe "can detect backward diagonal wins" $
