@@ -3,6 +3,7 @@ module ConnectFour.Game (
   Game,
   board,
   status,
+  isOver,
   StartingDisc,
   newGame,
   PlayError (..),
@@ -45,6 +46,12 @@ board = gameBoard
 
 status :: Game -> Status
 status = gameStatus
+
+isOver :: Game -> Bool
+isOver Game{..} =
+  case gameStatus of
+    WaitingFor _ -> False
+    _ -> True
 
 data PlayError
   = ColumnIsFull !Column

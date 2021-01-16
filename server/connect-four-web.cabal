@@ -41,7 +41,9 @@ common shared
     , base        ^>=4.13.0
     , bytestring  ^>=0.10.10
     , containers  ^>=0.6.2
+    , stm         ^>=2.5.0
     , text        ^>=1.2.4
+    , uuid        ^>=1.3.13
 
 library
   import:          shared
@@ -53,6 +55,7 @@ library
     ConnectFour.Game
     ConnectFour.Game.Board
     ConnectFour.Game.ColumnStack
+    ConnectFour.GameThread
     ConnectFour.PlayerName
 
 executable connect-four-web
@@ -70,10 +73,12 @@ test-suite connect-four-web-test
   ghc-options:        -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends: hspec-discover:hspec-discover -any
   build-depends:
+    , async             ^>=2.2.2
     , connect-four-web
     , hspec             ^>=2.7.4
 
   other-modules:
     ConnectFour.GameSpec
+    ConnectFour.GameThreadSpec
     ConnectFour.PlayerNameSpec
     Spec
