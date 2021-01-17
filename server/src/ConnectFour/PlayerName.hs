@@ -5,7 +5,7 @@ module ConnectFour.PlayerName (
   toText,
 ) where
 
-import Data.Aeson (ToJSON)
+import Data.Aeson (FromJSON (..), ToJSON, withText)
 import Data.Text (Text)
 import qualified Data.Text as Text
 
@@ -22,3 +22,9 @@ make (Text.strip -> playerName)
 
 toText :: PlayerName -> Text
 toText = fromPlayerName
+
+instance FromJSON PlayerName where
+  parseJSON = withText "PlayerName" $ \text ->
+    case make text of
+      Right playerName -> pure playerName
+      Left PlayerNameIsEmpty -> fail "PlayerName may not be mepty."

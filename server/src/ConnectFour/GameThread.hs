@@ -1,6 +1,5 @@
 module ConnectFour.GameThread (
   Event (..),
-  Move (..),
   Context (..),
   GameThread,
   createContext,
@@ -38,13 +37,14 @@ data GameThread msg = GameThread
 data Context msg = Context
   { contextGetGame :: !(IO Game)
   , contextReceive :: !(IO (Event msg))
-  , contextSend :: !(Move -> IO ())
+  , contextSend :: !(Disc -> Column -> IO ())
   }
 
 createContext :: GameThread msg -> IO (Context msg)
 createContext GameThread{..} =
   let get = STM.readTVarIO gameState
-      send = STM.atomically . STM.writeTBQueue gameInputQueue
+      send disc column =
+        STM.atomically $ STM.writeTBQueue gameInputQueue (Move disc column)
    in do
         receiveChan <- STM.atomically $ STM.dupTChan gameOutputChan
         let receive = STM.atomically $ STM.readTChan receiveChan
