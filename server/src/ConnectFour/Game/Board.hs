@@ -14,7 +14,7 @@ module ConnectFour.Game.Board (
 
 import ConnectFour.Game.ColumnStack (ColumnStack, ColumnView, Disc (..), Row (..))
 import qualified ConnectFour.Game.ColumnStack as ColumnStack
-import Data.Aeson (KeyValue ((.=)), ToJSON (toEncoding, toJSON), object, pairs)
+import Data.Aeson (KeyValue (..), ToJSON (toEncoding, toJSON), object, pairs)
 import Prelude hiding (lookup)
 
 data Board = Board
@@ -112,27 +112,20 @@ view Board{..} =
     , boardViewColumn7 = ColumnStack.view boardColumn7
     }
 
+boardViewToKV :: KeyValue kv => BoardView -> [kv]
+boardViewToKV BoardView{..} =
+  [ "column1" .= boardViewColumn1
+  , "column2" .= boardViewColumn2
+  , "column3" .= boardViewColumn3
+  , "column4" .= boardViewColumn4
+  , "column5" .= boardViewColumn5
+  , "column6" .= boardViewColumn6
+  , "column7" .= boardViewColumn7
+  ]
+
 instance ToJSON BoardView where
-  toJSON BoardView{..} =
-    object
-      [ "column1" .= boardViewColumn1
-      , "column2" .= boardViewColumn2
-      , "column3" .= boardViewColumn3
-      , "column4" .= boardViewColumn4
-      , "column5" .= boardViewColumn5
-      , "column6" .= boardViewColumn6
-      , "column7" .= boardViewColumn7
-      ]
-  toEncoding BoardView{..} =
-    pairs . mconcat $
-      [ "column1" .= boardViewColumn1
-      , "column2" .= boardViewColumn2
-      , "column3" .= boardViewColumn3
-      , "column4" .= boardViewColumn4
-      , "column5" .= boardViewColumn5
-      , "column6" .= boardViewColumn6
-      , "column7" .= boardViewColumn7
-      ]
+  toJSON = object . boardViewToKV
+  toEncoding = pairs . mconcat . boardViewToKV
 
 instance ToJSON Board where
   toJSON = toJSON . view

@@ -3,7 +3,7 @@ module ConnectFour.GameRepo (
   GameId,
   GameRepo,
   newGameRepo,
-  PendingGames (..),
+  PendingGame (..),
   listGames,
   OnlineGameOptions (..),
   GameContext,
@@ -51,33 +51,30 @@ newtype GameRepo = GameRepo (TVar (Map GameId OnlineGame))
 newGameRepo :: IO GameRepo
 newGameRepo = GameRepo <$> STM.newTVarIO Map.empty
 
-data PendingGames = PendingGames
+data PendingGame = PendingGame
   { pgGameId :: !GameId
   , pgPlayer1Name :: !PlayerName
   , pgPlayer1Disc :: !Disc
   }
   deriving (Show, Eq)
 
-instance ToJSON PendingGames where
-  toJSON PendingGames{..} =
-    object
-      [ "gameId" .= pgGameId
-      , "player1Name" .= pgPlayer1Name
-      , "player1Disc" .= pgPlayer1Disc
-      ]
-  toEncoding PendingGames{..} =
-    pairs . mconcat $
-      [ "gameId" .= pgGameId
-      , "player1Name" .= pgPlayer1Name
-      , "player1Disc" .= pgPlayer1Disc
-      ]
+pendingGameToKV :: KeyValue kv => PendingGame -> [kv]
+pendingGameToKV PendingGame{..} =
+  [ "gameId" .= pgGameId
+  , "player1Name" .= pgPlayer1Name
+  , "player1Disc" .= pgPlayer1Disc
+  ]
 
-listGames :: GameRepo -> IO [PendingGames]
+instance ToJSON PendingGame where
+  toJSON = object . pendingGameToKV
+  toEncoding = pairs . mconcat . pendingGameToKV
+
+listGames :: GameRepo -> IO [PendingGame]
 listGames (GameRepo onlineGames) = do
   games <- Map.assocs <$> STM.readTVarIO onlineGames
   pure $
     games <&> \(gameId, OnlineGame{..}) ->
-      PendingGames
+      PendingGame
         { pgGameId = gameId
         , pgPlayer1Name = ogPlayer1Name
         , pgPlayer1Disc = ogPlayer1Disc

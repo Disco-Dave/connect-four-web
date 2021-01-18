@@ -103,25 +103,19 @@ view stack =
     , columnViewRow6 = lookup Row6 stack
     }
 
+columnViewToKV :: KeyValue kv => ColumnView -> [kv]
+columnViewToKV ColumnView{..} =
+  [ "row1" .= columnViewRow1
+  , "row2" .= columnViewRow2
+  , "row3" .= columnViewRow3
+  , "row4" .= columnViewRow4
+  , "row5" .= columnViewRow5
+  , "row6" .= columnViewRow6
+  ]
+
 instance ToJSON ColumnView where
-  toJSON ColumnView{..} =
-    object
-      [ "row1" .= columnViewRow1
-      , "row2" .= columnViewRow2
-      , "row3" .= columnViewRow3
-      , "row4" .= columnViewRow4
-      , "row5" .= columnViewRow5
-      , "row6" .= columnViewRow6
-      ]
-  toEncoding ColumnView{..} =
-    pairs . mconcat $
-      [ "row1" .= columnViewRow1
-      , "row2" .= columnViewRow2
-      , "row3" .= columnViewRow3
-      , "row4" .= columnViewRow4
-      , "row5" .= columnViewRow5
-      , "row6" .= columnViewRow6
-      ]
+  toJSON = object . columnViewToKV
+  toEncoding = pairs . mconcat . columnViewToKV
 
 instance ToJSON ColumnStack where
   toJSON = toJSON . view
