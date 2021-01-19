@@ -112,11 +112,9 @@ handleEvents receive conn = do
     _ -> handleEvents receive conn
 
 startUserThreads :: IO (Event PlayerMsg) -> (Column -> IO ()) -> WebSockets.Connection -> IO ()
-startUserThreads receive send conn =
-  Async.withAsync (handleEvents receive conn) $ \eTask ->
-    Async.withAsync (handleUserInput send conn) $ \uiTask -> do
-      Async.wait eTask
-      Async.cancel uiTask
+startUserThreads receive send conn = do
+  _ <- Async.race (handleEvents receive conn) (handleUserInput send conn)
+  pure ()
 
 handleNewGame :: OnlineGameOptions -> GameRepo -> WebSockets.Connection -> IO ()
 handleNewGame opts repo conn =
