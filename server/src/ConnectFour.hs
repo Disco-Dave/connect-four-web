@@ -32,7 +32,7 @@ waiApp repo =
 
 start :: GameRepo -> Port -> IO ()
 start repo port =
-  let beforeMainLoop = putStrLn $ "Now listening on: " <> show port
+  let beforeMainLoop = putStrLn $ "Now listening at: http://localhost:" <> show port
       settings =
         Warp.defaultSettings
           & Warp.setPort port

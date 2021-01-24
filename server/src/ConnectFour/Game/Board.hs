@@ -81,13 +81,16 @@ lookup column row Board{..} =
 
 isFull :: Board -> Bool
 isFull Board{..} =
-  ColumnStack.isFull boardColumn1
-    && ColumnStack.isFull boardColumn2
-    && ColumnStack.isFull boardColumn3
-    && ColumnStack.isFull boardColumn4
-    && ColumnStack.isFull boardColumn5
-    && ColumnStack.isFull boardColumn6
-    && ColumnStack.isFull boardColumn7
+  let columns =
+        [ boardColumn1
+        , boardColumn2
+        , boardColumn3
+        , boardColumn4
+        , boardColumn5
+        , boardColumn6
+        , boardColumn7
+        ]
+   in all ColumnStack.isFull columns
 
 data BoardView = BoardView
   { boardViewColumn1 :: !ColumnView
