@@ -4,7 +4,7 @@ cradle:
       component: "connect-four-web:lib"
 
     - path: "./app/Main.hs"
-      component: "connect-four-web:exe:connect-four-web"
+      component: "connect-four-web:exe:connect-four-web-exe"
 
     - path: "./test"
       component: "connect-four-web:test:connect-four-web-test"

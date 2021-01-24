@@ -1,0 +1,67 @@
+name: connect-four-web
+version: 0.1.0.0
+maintainer: David Burkett
+extra-source-files:
+  - CHANGELOG.md
+
+ghc-options:
+  - -Wall
+  - -Wcompat
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wpartial-fields
+  - -Wredundant-constraints
+
+default-extensions:
+  - DeriveGeneric
+  - DerivingVia
+  - LambdaCase
+  - NamedFieldPuns
+  - NumericUnderscores
+  - OverloadedStrings
+  - RecordWildCards
+  - ScopedTypeVariables
+  - TupleSections
+  - TypeApplications
+  - ViewPatterns
+
+dependencies:
+  - aeson
+  - async
+  - base >= 4.7 && < 5
+  - containers
+  - http-types
+  - stm
+  - text
+  - uuid
+  - wai
+  - wai-websockets
+  - warp
+  - websockets
+library:
+  source-dirs: src
+
+executables:
+  connect-four-web-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - connect-four-web
+
+tests:
+  connect-four-web-test:
+    main: Main.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - connect-four-web
+      - hspec
+      - http-client
