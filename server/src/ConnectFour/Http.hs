@@ -12,4 +12,6 @@ waiApp gameRepo request send =
       games <- Aeson.encode <$> listGames gameRepo
       let headers = [("Content-Type", "application/json")]
        in send $ Wai.responseLBS HttpTypes.ok200 headers games
+    ("GET", ["healthcheck"]) ->
+      send $ Wai.responseLBS HttpTypes.status204 [] mempty
     _ -> send $ Wai.responseLBS HttpTypes.notFound404 [] ""

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 20bd5f84340082d0af50c7c4b50f01b6904cbcbd0236345cee1f33cde9d0c575
+-- hash: c41c9e835068f5d684a880205f7a43f7ac751f2740e55526fbd5f42969c0ebc0
 
 name:           connect-four-web
 version:        0.1.0.0
@@ -77,6 +77,7 @@ test-suite connect-four-web-test
   other-modules:
       ConnectFour.GameSpec
       ConnectFour.GameThreadSpec
+      ConnectFour.IntegrationSpec
       ConnectFour.PlayerNameSpec
       Spec
       Paths_connect_four_web

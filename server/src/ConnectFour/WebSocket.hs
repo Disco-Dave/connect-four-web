@@ -1,4 +1,4 @@
-module ConnectFour.WebSocket where
+module ConnectFour.WebSocket (serverApp) where
 
 import ConnectFour.Game (Game)
 import qualified ConnectFour.Game as Game
