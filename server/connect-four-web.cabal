@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c41c9e835068f5d684a880205f7a43f7ac751f2740e55526fbd5f42969c0ebc0
+-- hash: 2626875c56b19721b68558d7a3e200fe60c554a0c1c1ce86a26b35ce7f05e509
 
 name:           connect-four-web
 version:        0.1.0.0
@@ -83,10 +83,11 @@ test-suite connect-four-web-test
       Paths_connect_four_web
   hs-source-dirs:
       test
-  default-extensions: DeriveGeneric DerivingVia LambdaCase NamedFieldPuns NumericUnderscores OverloadedStrings RecordWildCards ScopedTypeVariables TupleSections TypeApplications ViewPatterns
+  default-extensions: DeriveGeneric DerivingVia LambdaCase NamedFieldPuns NumericUnderscores OverloadedStrings RecordWildCards ScopedTypeVariables TupleSections TypeApplications ViewPatterns QuasiQuotes
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
+    , aeson-qq
     , async
     , base >=4.7 && <5
     , connect-four-web

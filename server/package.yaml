@@ -61,7 +61,10 @@ tests:
       - -threaded
       - -rtsopts
       - -with-rtsopts=-N
+    default-extensions:
+      - QuasiQuotes
     dependencies:
+      - aeson-qq
       - connect-four-web
       - hspec
       - http-client
