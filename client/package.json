@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "serve": "rm -rf .parcel/serve && parcel --cache-dir .parcel/cache -d .parcel/serve static/index.html --open",
-    "bundle": "rm -rf dist && parcel build --no-source-maps --cache-dir .parcel/cache -d dist static/index.html"
+    "serve": "rm -rf .parcel/serve && parcel --cache-dir .parcel/cache -d .parcel/serve src/index.html --open",
+    "bundle": "rm -rf dist && parcel build --no-source-maps --cache-dir .parcel/cache -d dist src/index.html"
   },
   "keywords": [],
   "author": "",

@@ -1,3 +1,3 @@
-import { Elm } from '../src/Main.elm';
+import { Elm } from '../Main.elm';
 
 Elm.Main.init();
