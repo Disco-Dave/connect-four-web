@@ -1,0 +1,106 @@
+html {
+  /* Nord Colors: https://www.nordtheme.com/docs/colors-and-palettes */
+  --nord-polar-night-1: hsl(220, 16%, 22%);
+  --nord-polar-night-2: hsl(222, 16%, 28%);
+  --nord-polar-night-3: hsl(220, 17%, 32%);
+  --nord-polar-night-4: hsl(220, 16%, 36%);
+
+  --nord-snow-storm-1: hsl(219, 28%, 88%);
+  --nord-snow-storm-2: hsl(218, 27%, 92%);
+  --nord-snow-storm-3: hsl(218, 27%, 94%);
+
+  --nord-frost-1: hsl(179, 25%, 65%);
+  --nord-frost-2: hsl(193, 43%, 67%);
+  --nord-frost-3: hsl(210, 34%, 63%);
+  --nord-frost-4: hsl(213, 32%, 52%);
+
+  --nord-aurora-red: hsl(354, 42%, 56%);
+  --nord-aurora-orange: hsl(14, 51%, 63%);
+  --nord-aurora-yellow: hsl(40, 71%, 73%);
+  --nord-aurora-green: hsl(92, 28%, 65%);
+  --nord-aurora-purple: hsl(311, 20%, 63%);
+
+  --font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+
+  font-family: var(--font-family);
+}
+
+body {
+  margin: 0;
+  padding: 1.75rem;
+  color: var(--nord-snow-storm-1);
+  background-color: var(--nord-polar-night-1);
+}
+
+.title {
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3rem;
+  font-size: 2.25rem;
+}
+
+.form {
+  width: 100%;
+  max-width: 35rem;
+  margin: 0 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2em;
+}
+
+.field__label {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.field__input {
+  background-color: var(--nord-polar-night-3);
+  color: var(--nord-snow-storm-1);
+  border: 0.125rem solid var(--nord-polar-night-4);
+  border-radius: 0.125rem;
+  padding: 0.75rem;
+}
+
+.field__input:hover {
+  border-color: var(--nord-frost-2);
+}
+
+.field__input:focus {
+  border-color: var(--nord-frost-2);
+  box-shadow: 0px 0px 0.125rem 0.125rem hsl(193, 43%, 67%, 0.35);
+}
+
+.field--invalid .field__input {
+  box-shadow: none;
+  border-color: var(--nord-aurora-red);
+}
+
+.field--invalid .field__input:focus {
+  box-shadow: 0px 0px 0.125rem 0.125rem hsl(354, 42%, 56%, 0.35);
+}
+
+.button {
+  background-color: var(--nord-frost-4);
+  cursor: pointer;
+  padding: 0.75rem;
+  border: none;
+  color: var(--nord-snow-storm-1);
+  border: 0.125rem solid var(--nord-polar-night-4);
+  border-radius: 0.125rem;
+  width: 100%;
+  font-size: 1.175rem;
+}
+
+.button:hover {
+  border-color: var(--nord-frost-2);
+}
+
+.button:active {
+  box-shadow: 0px 0px 0.125rem 0.125rem hsl(193, 43%, 67%, 0.35);
+}
