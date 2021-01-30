@@ -85,6 +85,15 @@ body {
   box-shadow: 0px 0px 0.125rem 0.125rem hsl(354, 42%, 56%, 0.35);
 }
 
+.field__feedback {
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+.field--invalid .field__feedback {
+  color: var(--nord-aurora-red);
+}
+
 .button {
   background-color: var(--nord-frost-4);
   cursor: pointer;

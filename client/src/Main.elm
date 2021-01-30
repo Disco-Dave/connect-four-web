@@ -1,49 +1,39 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (..)
-import Html.Attributes exposing (class, for, id, name, type_)
-import Html.Events exposing (..)
-import Json.Decode as Json
+import Html as H
+import Html.Attributes as A
+import Pages.PlayerName as PlayerNamePage
 import Url
+
+
+type PageModel
+    = PlayerNameModel PlayerNamePage.Model
+    | OtherModel
 
 
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
+    , page : PageModel
     }
 
 
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | Submitted
+    | PlayerNameMsg PlayerNamePage.Msg
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    ( Model key url, Cmd.none )
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        LinkClicked urlRequest ->
-            case urlRequest of
-                Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
-
-                Browser.External href ->
-                    ( model, Nav.load href )
-
-        UrlChanged url ->
-            ( { model | url = url }
-            , Cmd.none
-            )
-
-        Submitted ->
-            ( model, Cmd.none )
+    ( { key = key
+      , url = url
+      , page = PlayerNameModel PlayerNamePage.init
+      }
+    , Cmd.none
+    )
 
 
 subscriptions : Model -> Sub Msg
@@ -51,30 +41,59 @@ subscriptions _ =
     Sub.none
 
 
-onSubmit : msg -> Attribute msg
-onSubmit msg =
-    preventDefaultOn "submit" (Json.map alwaysPreventDefault (Json.succeed msg))
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case ( msg, model.page ) of
+        ( LinkClicked urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
+                Browser.External href ->
+                    ( model, Nav.load href )
 
-alwaysPreventDefault : msg -> ( msg, Bool )
-alwaysPreventDefault msg =
-    ( msg, True )
+        ( UrlChanged url, _ ) ->
+            ( { model | url = url }
+            , Cmd.none
+            )
+
+        ( PlayerNameMsg pageMsg, PlayerNameModel pageModel ) ->
+            let
+                ( newPageModel, playerName ) =
+                    PlayerNamePage.update pageMsg pageModel
+
+                newModel =
+                    case playerName of
+                        Nothing ->
+                            { model | page = PlayerNameModel newPageModel }
+
+                        Just _ ->
+                            { model | page = OtherModel }
+            in
+            ( newModel, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 view : Model -> Browser.Document Msg
-view _ =
-    { title = "Connect Four"
-    , body =
-        [ h1 [ class "title" ] [ text "Pick a name" ]
-        , form [ class "form", onSubmit Submitted ]
-            [ div [ class "field" ]
-                [ label [ class "field__label", for "name" ] [ text "Name" ]
-                , input [ class "field__input", type_ "text", id "name", name "name" ] []
+view model =
+    let
+        renderPage toMsg { title, body } =
+            { title = title
+            , body = List.map (H.map toMsg) body
+            }
+    in
+    case model.page of
+        PlayerNameModel m ->
+            renderPage PlayerNameMsg (PlayerNamePage.view m)
+
+        _ ->
+            { title = "Connect Four - Todo"
+            , body =
+                [ H.h1 [ A.class "title" ] [ H.text "Todo" ]
                 ]
-            , button [ class "button", type_ "submit" ] [ text "Next" ]
-            ]
-        ]
-    }
+            }
 
 
 main : Program () Model Msg
