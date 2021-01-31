@@ -41,7 +41,7 @@ update msg model =
         Submitted ->
             let
                 playerName =
-                    PlayerName.make model.playerName
+                    PlayerName.fromString model.playerName
 
                 error =
                     case playerName of

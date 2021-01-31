@@ -69,19 +69,23 @@ update msg model =
                 ( newPageModel, playerName ) =
                     PlayerNamePage.update pageMsg pageModel
 
-                newModel =
+                ( newModel, cmd ) =
                     case playerName of
                         Nothing ->
-                            { model | page = PlayerNameModel newPageModel }
+                            ( { model | page = PlayerNameModel newPageModel }
+                            , Cmd.none
+                            )
 
                         Just name ->
                             let
-                                gameSelectionModel =
-                                    GameSelectionPage.init name
+                                ( gameSelectionModel, gameCmd ) =
+                                    GameSelectionPage.init model.apiUrl name
                             in
-                            { model | page = GameSelectionModel gameSelectionModel }
+                            ( { model | page = GameSelectionModel gameSelectionModel }
+                            , Cmd.map GameSelectionMsg gameCmd
+                            )
             in
-            ( newModel, Cmd.none )
+            ( newModel, cmd )
 
         ( GameSelectionMsg pageMsg, GameSelectionModel pageModel ) ->
             let
