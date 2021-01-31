@@ -1,3 +1,7 @@
-import { Elm } from './Main.elm';
+import {Elm} from './Main.elm';
 
-Elm.Main.init();
+const apiUrl = process.env.CONNECT_FOUR_WEB_URL;
+
+Elm.Main.init({
+  flags: apiUrl,
+});

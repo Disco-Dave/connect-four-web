@@ -3,19 +3,20 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Html as H
-import Html.Attributes as A
+import Pages.GameSelection as GameSelectionPage
 import Pages.PlayerName as PlayerNamePage
 import Url
 
 
 type PageModel
     = PlayerNameModel PlayerNamePage.Model
-    | OtherModel
+    | GameSelectionModel GameSelectionPage.Model
 
 
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
+    , apiUrl : String
     , page : PageModel
     }
 
@@ -24,12 +25,18 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | PlayerNameMsg PlayerNamePage.Msg
+    | GameSelectionMsg GameSelectionPage.Msg
 
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
+type alias Flags =
+    String
+
+
+init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
     ( { key = key
       , url = url
+      , apiUrl = flags
       , page = PlayerNameModel PlayerNamePage.init
       }
     , Cmd.none
@@ -67,10 +74,32 @@ update msg model =
                         Nothing ->
                             { model | page = PlayerNameModel newPageModel }
 
-                        Just _ ->
-                            { model | page = OtherModel }
+                        Just name ->
+                            let
+                                gameSelectionModel =
+                                    GameSelectionPage.init name
+                            in
+                            { model | page = GameSelectionModel gameSelectionModel }
             in
             ( newModel, Cmd.none )
+
+        ( GameSelectionMsg pageMsg, GameSelectionModel pageModel ) ->
+            let
+                ( newPageModel, pageCmd, parentMsg ) =
+                    GameSelectionPage.update pageMsg pageModel
+
+                newPage =
+                    case parentMsg of
+                        Just GameSelectionPage.GoBack ->
+                            PlayerNamePage.init
+                                |> PlayerNameModel
+
+                        _ ->
+                            GameSelectionModel newPageModel
+            in
+            ( { model | page = newPage }
+            , Cmd.map GameSelectionMsg pageCmd
+            )
 
         _ ->
             ( model, Cmd.none )
@@ -88,15 +117,11 @@ view model =
         PlayerNameModel m ->
             renderPage PlayerNameMsg (PlayerNamePage.view m)
 
-        _ ->
-            { title = "Connect Four - Todo"
-            , body =
-                [ H.h1 [ A.class "title" ] [ H.text "Todo" ]
-                ]
-            }
+        GameSelectionModel m ->
+            renderPage GameSelectionMsg (GameSelectionPage.view m)
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.application
         { init = init

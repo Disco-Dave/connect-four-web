@@ -42,7 +42,8 @@ body {
   font-size: 2.25rem;
 }
 
-.form {
+.form,
+.games {
   width: 100%;
   max-width: 35rem;
   margin: 0 auto;
@@ -104,6 +105,15 @@ body {
   border-radius: 0.125rem;
   width: 100%;
   font-size: 1.175rem;
+  margin-bottom: 0.25rem;
+}
+
+.button--danger {
+  background-color: var(--nord-aurora-red);
+}
+
+.button:last-of-type {
+  margin-bottom: 0;
 }
 
 .button:hover {
@@ -113,3 +123,12 @@ body {
 .button:active {
   box-shadow: 0px 0px 0.125rem 0.125rem hsl(193, 43%, 67%, 0.35);
 }
+
+.available-games { 
+  width: 100%;
+  height: 40rem;
+  border: 0.125rem solid var(--nord-polar-night-4);
+  border-radius: 0.125rem;
+  margin-bottom: 1.5rem;
+}
+
