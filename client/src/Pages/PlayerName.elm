@@ -76,24 +76,26 @@ view model =
     in
     { title = "Connect Four - Pick a name"
     , body =
-        [ H.h1 [ A.class "title" ] [ H.text "Pick a name" ]
-        , H.form [ A.class "form", onSubmit Submitted ]
-            [ H.div (A.class "field" :: extraFieldClasses)
-                ([ H.label [ A.class "field__label", A.for "name" ] [ H.text "Name" ]
-                 , H.input
-                    [ A.class "field__input"
-                    , A.type_ "text"
-                    , A.id "name"
-                    , A.name "name"
-                    , A.value model.playerName
-                    , E.onInput PlayerNameChanged
-                    , E.onBlur PlayerNameBlurred
-                    ]
-                    []
-                 ]
-                    ++ feedback
-                )
-            , H.button [ A.class "button", A.type_ "submit" ] [ H.text "Next" ]
+        [ H.main_ [ A.class "main" ]
+            [ H.h1 [ A.class "title" ] [ H.text "Pick a name" ]
+            , H.form [ A.class "form", onSubmit Submitted ]
+                [ H.div (A.class "field" :: extraFieldClasses)
+                    ([ H.label [ A.class "field__label", A.for "name" ] [ H.text "Name" ]
+                     , H.input
+                        [ A.class "field__input"
+                        , A.type_ "text"
+                        , A.id "name"
+                        , A.name "name"
+                        , A.value model.playerName
+                        , E.onInput PlayerNameChanged
+                        , E.onBlur PlayerNameBlurred
+                        ]
+                        []
+                     ]
+                        ++ feedback
+                    )
+                , H.button [ A.class "button", A.type_ "submit" ] [ H.text "Next" ]
+                ]
             ]
         ]
     }

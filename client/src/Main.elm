@@ -4,19 +4,23 @@ import Browser
 import Browser.Navigation as Nav
 import Html as H
 import Pages.GameSelection as GameSelectionPage
+import Pages.NewGame as NewGamePage
 import Pages.PlayerName as PlayerNamePage
+import PlayerName exposing (PlayerName)
 import Url
 
 
 type PageModel
     = PlayerNameModel PlayerNamePage.Model
     | GameSelectionModel GameSelectionPage.Model
+    | NewGameModel NewGamePage.Model
 
 
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , apiUrl : String
+    , playerName : Maybe PlayerName
     , page : PageModel
     }
 
@@ -26,6 +30,7 @@ type Msg
     | UrlChanged Url.Url
     | PlayerNameMsg PlayerNamePage.Msg
     | GameSelectionMsg GameSelectionPage.Msg
+    | NewGameMsg NewGamePage.Msg
 
 
 type alias Flags =
@@ -38,6 +43,7 @@ init flags url key =
       , url = url
       , apiUrl = flags
       , page = PlayerNameModel PlayerNamePage.init
+      , playerName = Nothing
       }
     , Cmd.none
     )
@@ -79,9 +85,12 @@ update msg model =
                         Just name ->
                             let
                                 ( gameSelectionModel, gameCmd ) =
-                                    GameSelectionPage.init model.apiUrl name
+                                    GameSelectionPage.init model.apiUrl
                             in
-                            ( { model | page = GameSelectionModel gameSelectionModel }
+                            ( { model
+                                | page = GameSelectionModel gameSelectionModel
+                                , playerName = Just name
+                              }
                             , Cmd.map GameSelectionMsg gameCmd
                             )
             in
@@ -98,11 +107,41 @@ update msg model =
                             PlayerNamePage.init
                                 |> PlayerNameModel
 
-                        _ ->
+                        Just GameSelectionPage.NewGame ->
+                            NewGamePage.init
+                                |> NewGameModel
+
+                        Nothing ->
                             GameSelectionModel newPageModel
             in
             ( { model | page = newPage }
             , Cmd.map GameSelectionMsg pageCmd
+            )
+
+        ( NewGameMsg pageMsg, NewGameModel pageModel ) ->
+            let
+                ( newPageModel, parentMsg ) =
+                    NewGamePage.update pageMsg pageModel
+
+                ( newPage, pageCmd ) =
+                    case parentMsg of
+                        Just NewGamePage.GoBack ->
+                            let
+                                ( gameSelectionModel, gameSelectionCmd ) =
+                                    GameSelectionPage.init model.apiUrl
+                            in
+                            ( GameSelectionModel gameSelectionModel
+                            , Cmd.map GameSelectionMsg gameSelectionCmd
+                            )
+
+                        Just (NewGamePage.StartGame _) ->
+                            ( NewGameModel newPageModel, Cmd.none )
+
+                        Nothing ->
+                            ( NewGameModel newPageModel, Cmd.none )
+            in
+            ( { model | page = newPage }
+            , pageCmd
             )
 
         _ ->
@@ -123,6 +162,9 @@ view model =
 
         GameSelectionModel m ->
             renderPage GameSelectionMsg (GameSelectionPage.view m)
+
+        NewGameModel m ->
+            renderPage NewGameMsg (NewGamePage.view m)
 
 
 main : Program Flags Model Msg

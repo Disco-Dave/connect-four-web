@@ -11,17 +11,20 @@ module ConnectFour.GameRepo (
   createGame,
   WithMaybeGameContext,
   joinGame,
+  fakePendingGames,
 ) where
 
 import ConnectFour.Game (StartingDisc)
-import ConnectFour.Game.Board (Disc)
+import ConnectFour.Game.Board (Disc (..))
 import ConnectFour.Game.ColumnStack (oppositeDisc)
 import ConnectFour.GameThread (Context (..), GameThread)
 import qualified ConnectFour.GameThread as GameThread
 import ConnectFour.PlayerName (PlayerName)
+import qualified ConnectFour.PlayerName as PlayerName
 import Control.Concurrent.STM (TVar)
 import qualified Control.Concurrent.STM as STM
 import Control.Exception (bracket)
+import Control.Monad (replicateM)
 import Data.Aeson (FromJSON, KeyValue (..), ToJSON (..), object, pairs)
 import Data.Functor ((<&>))
 import Data.Map.Strict (Map)
@@ -57,6 +60,19 @@ data PendingGame = PendingGame
   , pgPlayer1Disc :: !Disc
   }
   deriving (Show, Eq)
+
+fakePendingGames :: IO [PendingGame]
+fakePendingGames = do
+  let unsafePlayerName = either undefined id . PlayerName.make
+  [g1, g2, g3, g4, g5, g6] <- replicateM 6 newGameId
+  pure
+    [ PendingGame g1 (unsafePlayerName "David") RedDisc
+    , PendingGame g2 (unsafePlayerName "Ashlyn") YellowDisc
+    , PendingGame g3 (unsafePlayerName "Mochi") YellowDisc
+    , PendingGame g4 (unsafePlayerName "Sarabi") RedDisc
+    , PendingGame g5 (unsafePlayerName "Sagwa") RedDisc
+    , PendingGame g6 (unsafePlayerName "Kabuki") RedDisc
+    ]
 
 pendingGameToKV :: KeyValue kv => PendingGame -> [kv]
 pendingGameToKV PendingGame{..} =

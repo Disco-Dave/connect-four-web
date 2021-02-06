@@ -42,11 +42,14 @@ body {
   font-size: 2.25rem;
 }
 
-.form,
-.games {
+.main {
   width: 100%;
   max-width: 35rem;
   margin: 0 auto;
+}
+
+.main--full-height {
+  height: calc(100vh - (2 * 1.75rem));
 }
 
 .field {
@@ -66,6 +69,12 @@ body {
   border: 0.125rem solid var(--nord-polar-night-4);
   border-radius: 0.125rem;
   padding: 0.75rem;
+}
+
+.field__radios {
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 
 .field__input:hover {
@@ -95,6 +104,49 @@ body {
   color: var(--nord-aurora-red);
 }
 
+.radio {
+  margin-bottom: 0.25rem;
+}
+
+.radio:last-of-type {
+  margin-bottom: 0;
+}
+
+.radio__label {
+  cursor: pointer;
+}
+
+.radio__input {
+  display: none;
+}
+
+.radio__input + *::before {
+  content: "";
+  display: inline-block;
+  vertical-align: bottom;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 0.125rem;
+  border-color: var(--nord-snow-storm-1);
+}
+
+.radio__input:checked + *::before {
+  background: radial-gradient(
+    var(--nord-frost-2) 0%,
+    var(--nord-frost-2) 30%,
+    transparent 40%,
+    transparent
+  );
+  border-color: var(--nord-frost-2);
+}
+
+.radio__input:checked + * {
+  color: var(--nord-frost-2);
+}
+
 .button {
   background-color: var(--nord-frost-4);
   cursor: pointer;
@@ -112,6 +164,10 @@ body {
   background-color: var(--nord-aurora-red);
 }
 
+.button--secondary {
+  background-color: var(--nord-frost-3);
+}
+
 .button:last-of-type {
   margin-bottom: 0;
 }
@@ -124,11 +180,72 @@ body {
   box-shadow: 0px 0px 0.125rem 0.125rem hsl(193, 43%, 67%, 0.35);
 }
 
-.available-games { 
+.games {
   width: 100%;
-  height: 40rem;
+  height: calc(100% - 10rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.available-games {
+  overflow-y: auto;
+  width: calc(100% - (0.125rem * 2) - (1.25rem * 2));
+  height: calc(100% - (0.125rem * 2) - (1.25rem * 2));
   border: 0.125rem solid var(--nord-polar-night-4);
   border-radius: 0.125rem;
   margin-bottom: 1.5rem;
+  padding: 1.25rem;
 }
 
+.available-games__info {
+  text-align: center;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading::after {
+  content: "";
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: calc(50% - 2rem);
+  margin: 0 auto;
+  height: 0;
+  width: 0;
+  border: 2rem solid var(--nord-snow-storm-1);
+  border-top: 2rem solid var(--nord-frost-4);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+
+.pending-game {
+  display: flex;
+  margin-bottom: 1.175rem;
+  align-items: center;
+}
+
+.pending-game:last-of-type {
+  margin-bottom: 1.25rem;
+}
+
+.pending-game__join {
+  margin-right: 1rem;
+  color: var(--nord-frost-4);
+}
+
+.pending-game__player {
+  margin: 0;
+  font-size: 1.25rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
