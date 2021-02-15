@@ -99,7 +99,7 @@ update msg model =
         ( GameSelectionMsg pageMsg, GameSelectionModel pageModel ) ->
             let
                 ( newPageModel, pageCmd, parentMsg ) =
-                    GameSelectionPage.update pageMsg pageModel
+                    GameSelectionPage.update model.apiUrl pageMsg pageModel
 
                 newPage =
                     case parentMsg of

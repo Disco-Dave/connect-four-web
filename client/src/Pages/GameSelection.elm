@@ -42,9 +42,7 @@ isLoading pendingGames =
 
 
 type alias Model =
-    { pendingGames : PendingGames
-    , apiUrl : String
-    }
+    PendingGames
 
 
 type Msg
@@ -75,8 +73,8 @@ getPendingGames apiUrl =
         }
 
 
-update : Msg -> Model -> ( Model, Cmd Msg, Maybe ParentMsg )
-update msg model =
+update : String -> Msg -> Model -> ( Model, Cmd Msg, Maybe ParentMsg )
+update apiUrl msg model =
     case msg of
         GotPendingGames result ->
             let
@@ -88,14 +86,14 @@ update msg model =
                         Ok p ->
                             PendingGamesLoaded p
             in
-            ( { model | pendingGames = newPendingGames }
+            ( newPendingGames
             , Cmd.none
             , Nothing
             )
 
         Refresh ->
-            ( { model | pendingGames = PendingGamesNotLoaded }
-            , getPendingGames model.apiUrl
+            ( PendingGamesNotLoaded
+            , getPendingGames apiUrl
             , Nothing
             )
 
@@ -152,8 +150,8 @@ view model =
             [ H.h1 [ A.class "title" ] [ H.text "Select a game" ]
             , H.div [ A.class "games" ]
                 [ H.div
-                    [ A.classList [ ( "available-games", True ), ( "loading", isLoading model.pendingGames ) ] ]
-                    (viewGames model.pendingGames)
+                    [ A.classList [ ( "available-games", True ), ( "loading", isLoading model ) ] ]
+                    (viewGames model)
                 , H.button
                     [ A.class "button button--danger"
                     , A.type_ "button"
@@ -180,8 +178,6 @@ view model =
 
 init : String -> ( Model, Cmd Msg )
 init apiUrl =
-    ( { pendingGames = PendingGamesNotLoaded
-      , apiUrl = apiUrl
-      }
+    ( PendingGamesNotLoaded
     , getPendingGames apiUrl
     )

@@ -3,6 +3,7 @@ module Disc exposing
     , decoder
     , encode
     , fromString
+    , opposite
     , toString
     )
 
@@ -13,6 +14,16 @@ import Json.Encode as Encode
 type Disc
     = YellowDisc
     | RedDisc
+
+
+opposite : Disc -> Disc
+opposite disc =
+    case disc of
+        YellowDisc ->
+            RedDisc
+
+        RedDisc ->
+            YellowDisc
 
 
 toString : Disc -> String
