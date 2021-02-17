@@ -13,9 +13,11 @@ module ConnectFour.Game (
 import ConnectFour.Game.Board (Board, Column (..), Disc (..), Row (..))
 import qualified ConnectFour.Game.Board as Board
 import ConnectFour.Game.ColumnStack (oppositeDisc)
-import Data.Aeson (ToJSON)
+import Data.Aeson (KeyValue ((.=)), ToJSON (..))
+import qualified Data.Aeson as Aeson
 import Data.List (nub)
 import Data.Maybe (listToMaybe, mapMaybe)
+import Data.Text (Text)
 import GHC.Generics (Generic)
 
 data Status
@@ -24,7 +26,22 @@ data Status
   | Win !Disc
   deriving (Show, Eq, Generic)
 
-instance ToJSON Status
+instance ToJSON Status where
+  toJSON = \case
+    WaitingFor disc ->
+      Aeson.object
+        [ "_type" .= ("waitingFor" :: Text)
+        , "disc" .= disc
+        ]
+    Win disc ->
+      Aeson.object
+        [ "_type" .= ("win" :: Text)
+        , "disc" .= disc
+        ]
+    Tie ->
+      Aeson.object
+        [ "_type" .= ("tie" :: Text)
+        ]
 
 data Game = Game
   { gameBoard :: !Board
