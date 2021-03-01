@@ -16,7 +16,6 @@ module GameConnection exposing
 import Disc exposing (Disc)
 import GameId exposing (GameId)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline as DecodePipeline
 import Json.Encode as Encode
 import PlayerName exposing (PlayerName)
 import Ports
@@ -106,18 +105,17 @@ columnDecoder : Decoder Column
 columnDecoder =
     let
         row n =
-            DecodePipeline.optional
+            Decode.field
                 ("row" ++ String.fromInt n)
-                (Decode.map Just Disc.decoder)
-                Nothing
+                (Decode.nullable Disc.decoder)
     in
-    Decode.succeed Column
-        |> row 1
-        |> row 2
-        |> row 3
-        |> row 4
-        |> row 5
-        |> row 6
+    Decode.map6 Column
+        (row 1)
+        (row 2)
+        (row 3)
+        (row 4)
+        (row 5)
+        (row 6)
 
 
 type alias Board =
@@ -135,16 +133,16 @@ boardDecoder : Decoder Board
 boardDecoder =
     let
         column n =
-            DecodePipeline.required ("column" ++ String.fromInt n) columnDecoder
+            Decode.field ("column" ++ String.fromInt n) columnDecoder
     in
-    Decode.succeed Board
-        |> column 1
-        |> column 2
-        |> column 3
-        |> column 4
-        |> column 5
-        |> column 6
-        |> column 7
+    Decode.map7 Board
+        (column 1)
+        (column 2)
+        (column 3)
+        (column 4)
+        (column 5)
+        (column 6)
+        (column 7)
 
 
 type Status
@@ -178,6 +176,8 @@ type Event
     | PlayerLeft PlayerName
     | GameUpdated Status Board
     | GameOver
+    | NewReceived GameId Disc Status Board
+    | JoinReceived GameId Disc Status Board PlayerName
 
 
 eventDecoder : Decoder Event
@@ -201,18 +201,31 @@ eventDecoder =
                     "gameOver" ->
                         Decode.succeed GameOver
 
+                    "newReceived" ->
+                        Decode.map4
+                            NewReceived
+                            (Decode.field "gameId" GameId.decoder)
+                            (Decode.field "yourDiscColor" Disc.decoder)
+                            (Decode.field "status" statusDecoder)
+                            (Decode.field "board" boardDecoder)
+
+                    "joinReceived" ->
+                        Decode.map5
+                            JoinReceived
+                            (Decode.field "gameId" GameId.decoder)
+                            (Decode.field "yourDiscColor" Disc.decoder)
+                            (Decode.field "status" statusDecoder)
+                            (Decode.field "board" boardDecoder)
+                            (Decode.field "otherPlayerName" PlayerName.decoder)
+
                     _ ->
                         Decode.fail "Unrecognized \"_type\" for Status"
             )
 
 
-subscribe : Sub (Maybe Event)
+subscribe : Sub (Result Decode.Error Event)
 subscribe =
-    let
-        convert =
-            Decode.decodeValue eventDecoder >> Result.toMaybe
-    in
-    Ports.receive convert
+    Ports.receive (Decode.decodeValue eventDecoder)
 
 
 close : () -> Cmd msg

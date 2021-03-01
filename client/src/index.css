@@ -239,7 +239,7 @@ body {
 
 .pending-game__join {
   margin-right: 1rem;
-  color: var(--nord-frost-4);
+  color: var(--nord-frost-2);
 }
 
 .pending-game__player {

@@ -2,6 +2,7 @@ module Pages.Game exposing (..)
 
 import Browser
 import Disc exposing (Disc(..))
+import GameConnection
 import GameId exposing (GameId)
 import Html as H
 import Html.Attributes as A
@@ -50,7 +51,8 @@ player2Disc { player1Disc } =
 
 
 type Msg
-    = NoOp
+    = ReceivedEvent (Result Decode.Error GameConnection.Event)
+    | NoOp
 
 
 init : Init -> ( Model, Cmd Msg )
@@ -62,7 +64,11 @@ init initArgs =
               , player1Disc = Just player1Disc
               , player2Name = Nothing
               }
-            , Cmd.none
+            , GameConnection.newGame
+                { player1Name = player1Name
+                , player1Disc = player1Disc
+                , startingDisc = startingDisc
+                }
             )
 
         Join player2Name gameId ->
@@ -71,5 +77,29 @@ init initArgs =
               , player1Disc = Nothing
               , player2Name = Just player2Name
               }
-            , Cmd.none
+            , GameConnection.joinGame
+                { gameId = gameId
+                , player2Name = player2Name
+                }
             )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update _ model =
+    ( model, Cmd.none )
+
+
+subscriptions : Sub Msg
+subscriptions =
+    Sub.map ReceivedEvent GameConnection.subscribe
+
+
+view : Model -> Browser.Document Msg
+view _ =
+    { title = "Connect Four - New Game"
+    , body =
+        [ H.main_ [ A.class "main" ]
+            [ H.h1 [ A.class "title" ] [ H.text "TODO" ]
+            ]
+        ]
+    }

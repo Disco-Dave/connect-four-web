@@ -14,24 +14,26 @@ function close() {
   }
 }
 
-app.ports.close.subscribe(close);
+console.log(app.ports);
 
-app.ports.connect.subscribe((message) => {
+//app.ports?.close.subscribe(close);
+
+app.ports?.connect.subscribe((message) => {
   close();
 
   connection = new WebSocket(socketUrl);
 
   connection.onmessage = (event) => {
-    app.ports.receive.send(event?.data);
+    app.ports?.receive.send(JSON.parse(event?.data));
   }
 
   connection.onopen = () => {
-    connection.send(message);
+    connection.send(JSON.stringify(message));
   };
 });
 
-app.ports.send.subscribe((message) => {
-  if (connection && connection.send) {
-    connection.send(message);
-  }
-});
+//app.ports?.send.subscribe((message) => {
+  //if (connection && connection.send) {
+    //connection.send(message);
+  //}
+//});

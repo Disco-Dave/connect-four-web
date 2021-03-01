@@ -123,7 +123,8 @@ handleNewGame opts repo conn =
     game <- getGame
     let msg =
           Aeson.object
-            [ "gameId" .= gameId
+            [ "_type" .= ("newReceived" :: Text)
+            , "gameId" .= gameId
             , "yourDiscColor" .= disc
             , "board" .= Game.board game
             , "status" .= Game.status game
@@ -141,7 +142,8 @@ handleJoinGame gameId playerName repo conn =
       game <- getGame
       let msg =
             Aeson.object
-              [ "gameId" .= gameId
+              [ "_type" .= ("joinReceived" :: Text)
+              , "gameId" .= gameId
               , "yourDiscColor" .= disc
               , "board" .= Game.board game
               , "status" .= Game.status game

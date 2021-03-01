@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Navigation as Nav
 import Html as H
+import Pages.Game as GamePage
 import Pages.GameSelection as GameSelectionPage
 import Pages.NewGame as NewGamePage
 import Pages.PlayerName as PlayerNamePage
@@ -14,6 +15,7 @@ type PageModel
     = PlayerNameModel PlayerNamePage.Model
     | GameSelectionModel GameSelectionPage.Model
     | NewGameModel NewGamePage.Model
+    | GameModel GamePage.Model
 
 
 type alias Model =
@@ -31,6 +33,7 @@ type Msg
     | PlayerNameMsg PlayerNamePage.Msg
     | GameSelectionMsg GameSelectionPage.Msg
     | NewGameMsg NewGamePage.Msg
+    | GameMsg GamePage.Msg
 
 
 type alias Flags =
@@ -51,7 +54,7 @@ init flags url key =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.map GameMsg GamePage.subscriptions
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -124,8 +127,8 @@ update msg model =
                     NewGamePage.update pageMsg pageModel
 
                 ( newPage, pageCmd ) =
-                    case parentMsg of
-                        Just NewGamePage.GoBack ->
+                    case ( parentMsg, model.playerName ) of
+                        ( Just NewGamePage.GoBack, _ ) ->
                             let
                                 ( gameSelectionModel, gameSelectionCmd ) =
                                     GameSelectionPage.init model.apiUrl
@@ -134,10 +137,13 @@ update msg model =
                             , Cmd.map GameSelectionMsg gameSelectionCmd
                             )
 
-                        Just (NewGamePage.StartGame _) ->
-                            ( NewGameModel newPageModel, Cmd.none )
+                        ( Just (NewGamePage.StartGame game), Just player1Name ) ->
+                            let (gameModel, gameCmd) =
+                                    GamePage.New player1Name game.player1Disc game.startingDisc 
+                                    |> GamePage.init
+                            in ( GameModel gameModel, Cmd.map GameMsg gameCmd )
 
-                        Nothing ->
+                        _ ->
                             ( NewGameModel newPageModel, Cmd.none )
             in
             ( { model | page = newPage }
@@ -165,6 +171,9 @@ view model =
 
         NewGameModel m ->
             renderPage NewGameMsg (NewGamePage.view m)
+
+        GameModel m ->
+            renderPage GameMsg (GamePage.view m)
 
 
 main : Program Flags Model Msg
