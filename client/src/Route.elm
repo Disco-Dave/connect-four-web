@@ -3,7 +3,7 @@ module Route exposing (Route(..), parse, push, replace)
 import Browser.Navigation as Navigation
 import GameId exposing (GameId)
 import Url exposing (Url)
-import Url.Parser as Parser exposing (Parser)
+import Url.Parser as Parser
 
 
 type Route

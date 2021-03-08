@@ -1,179 +1,226 @@
-module Main exposing (main)
+module Main exposing (..)
 
-import Browser
-import Browser.Navigation as Nav
-import Html as H
-import Pages.Game as GamePage
-import Pages.GameSelection as GameSelectionPage
-import Pages.NewGame as NewGamePage
-import Pages.PlayerName as PlayerNamePage
+import Browser exposing (Document, UrlRequest)
+import Browser.Navigation as Navigation
+import Html
+import Pages.Game
+import Pages.GameSelection
+import Pages.NewGame
+import Pages.PlayerName
 import PlayerName exposing (PlayerName)
-import Url
-
-
-type PageModel
-    = PlayerNameModel PlayerNamePage.Model
-    | GameSelectionModel GameSelectionPage.Model
-    | NewGameModel NewGamePage.Model
-    | GameModel GamePage.Model
-
-
-type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , apiUrl : String
-    , playerName : Maybe PlayerName
-    , page : PageModel
-    }
-
-
-type Msg
-    = LinkClicked Browser.UrlRequest
-    | UrlChanged Url.Url
-    | PlayerNameMsg PlayerNamePage.Msg
-    | GameSelectionMsg GameSelectionPage.Msg
-    | NewGameMsg NewGamePage.Msg
-    | GameMsg GamePage.Msg
+import Route exposing (Route)
+import Url exposing (Url)
 
 
 type alias Flags =
     String
 
 
-init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
-    ( { key = key
-      , url = url
-      , apiUrl = flags
-      , page = PlayerNameModel PlayerNamePage.init
+type Page
+    = GamePage Pages.Game.Model
+    | GameSelectionPage Pages.GameSelection.Model
+    | NewGamePage Pages.NewGame.Model
+    | PlayerNamePage Pages.PlayerName.Model
+
+
+type alias Model =
+    { page : Page
+    , route : Route
+    , playerName : Maybe PlayerName
+    , apiUrl : String
+    , navKey : Navigation.Key
+    }
+
+
+type PageMsg
+    = GameMsg Pages.Game.Msg
+    | GameSelectionMsg Pages.GameSelection.Msg
+    | NewGameMsg Pages.NewGame.Msg
+    | PlayerNameMsg Pages.PlayerName.Msg
+
+
+type Msg
+    = LinkClicked UrlRequest
+    | UrlChanged Url
+    | ReceivedPageMsg PageMsg
+
+
+toRoute : Url -> Route
+toRoute =
+    Route.parse >> Maybe.withDefault Route.Home
+
+
+init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
+init apiUrl url navKey =
+    ( { page = PlayerNamePage Pages.PlayerName.init
+      , route = toRoute url
       , playerName = Nothing
+      , apiUrl = apiUrl
+      , navKey = navKey
       }
     , Cmd.none
     )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.map GameMsg GamePage.subscriptions
+view : Model -> Document Msg
+view model =
+    let
+        renderPage toMsg { title, body } =
+            { title = title
+            , body = List.map (Html.map (toMsg >> ReceivedPageMsg)) body
+            }
+    in
+    case model.page of
+        PlayerNamePage m ->
+            renderPage PlayerNameMsg (Pages.PlayerName.view m)
+
+        GameSelectionPage m ->
+            renderPage GameSelectionMsg (Pages.GameSelection.view m)
+
+        NewGamePage m ->
+            renderPage NewGameMsg (Pages.NewGame.view m)
+
+        GamePage m ->
+            renderPage GameMsg (Pages.Game.view m)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case ( msg, model.page ) of
-        ( LinkClicked urlRequest, _ ) ->
-            case urlRequest of
-                Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
+updatePage : PageMsg -> Model -> ( Model, Cmd Msg )
+updatePage pageMsg model =
+    let
+        toModel toMainModel pageModel =
+            { model | page = toMainModel pageModel }
 
-                Browser.External href ->
-                    ( model, Nav.load href )
+        toCmd toPageMsg =
+            Cmd.map (toPageMsg >> ReceivedPageMsg)
+    in
+    case ( pageMsg, model.page ) of
+        ( GameMsg gameMsg, GamePage gameModel ) ->
+            Pages.Game.update gameMsg gameModel
+                |> Tuple.mapBoth (toModel GamePage) (toCmd GameMsg)
 
-        ( UrlChanged url, _ ) ->
-            ( { model | url = url }
-            , Cmd.none
-            )
-
-        ( PlayerNameMsg pageMsg, PlayerNameModel pageModel ) ->
+        ( GameSelectionMsg gameSelectionMsg, GameSelectionPage gameSelectionPage ) ->
             let
-                ( newPageModel, playerName ) =
-                    PlayerNamePage.update pageMsg pageModel
-
-                ( newModel, cmd ) =
-                    case playerName of
-                        Nothing ->
-                            ( { model | page = PlayerNameModel newPageModel }
-                            , Cmd.none
-                            )
-
-                        Just name ->
-                            let
-                                ( gameSelectionModel, gameCmd ) =
-                                    GameSelectionPage.init model.apiUrl
-                            in
-                            ( { model
-                                | page = GameSelectionModel gameSelectionModel
-                                , playerName = Just name
-                              }
-                            , Cmd.map GameSelectionMsg gameCmd
-                            )
+                ( newGameSelectionModel, newGameSelectionCmd, parentMsg ) =
+                    Pages.GameSelection.update model.apiUrl gameSelectionMsg gameSelectionPage
             in
-            ( newModel, cmd )
+            case parentMsg of
+                Just Pages.GameSelection.GoBack ->
+                    ( { model
+                        | playerName = Nothing
+                        , page = PlayerNamePage Pages.PlayerName.init
+                      }
+                    , toCmd GameSelectionMsg newGameSelectionCmd
+                    )
 
-        ( GameSelectionMsg pageMsg, GameSelectionModel pageModel ) ->
+                Just Pages.GameSelection.NewGame ->
+                    ( { model | page = NewGamePage Pages.NewGame.init }
+                    , toCmd GameSelectionMsg newGameSelectionCmd
+                    )
+
+                Nothing ->
+                    ( toModel GameSelectionPage newGameSelectionModel
+                    , toCmd GameSelectionMsg newGameSelectionCmd
+                    )
+
+        ( NewGameMsg newGameMsg, NewGamePage newGamePage ) ->
             let
-                ( newPageModel, pageCmd, parentMsg ) =
-                    GameSelectionPage.update model.apiUrl pageMsg pageModel
-
-                newPage =
-                    case parentMsg of
-                        Just GameSelectionPage.GoBack ->
-                            PlayerNamePage.init
-                                |> PlayerNameModel
-
-                        Just GameSelectionPage.NewGame ->
-                            NewGamePage.init
-                                |> NewGameModel
-
-                        Nothing ->
-                            GameSelectionModel newPageModel
+                ( newNewGameModel, parentMsg ) =
+                    Pages.NewGame.update newGameMsg newGamePage
             in
-            ( { model | page = newPage }
-            , Cmd.map GameSelectionMsg pageCmd
-            )
+            case ( parentMsg, model.playerName ) of
+                ( Just Pages.NewGame.GoBack, _ ) ->
+                    let
+                        ( gameSelectionModel, gameSelectionCmd ) =
+                            Pages.GameSelection.init model.apiUrl
+                    in
+                    ( toModel GameSelectionPage gameSelectionModel
+                    , toCmd GameSelectionMsg gameSelectionCmd
+                    )
 
-        ( NewGameMsg pageMsg, NewGameModel pageModel ) ->
+                ( Just (Pages.NewGame.StartGame newGame), Just playerName ) ->
+                    let
+                        ( gameModel, gameCmd ) =
+                            Pages.Game.New playerName newGame.player1Disc newGame.startingDisc
+                                |> Pages.Game.init
+                    in
+                    ( { model
+                        | page = GamePage gameModel
+                      }
+                    , toCmd GameMsg gameCmd
+                    )
+
+                _ ->
+                    ( toModel NewGamePage newNewGameModel
+                    , Cmd.none
+                    )
+
+        ( PlayerNameMsg playerNameMsg, PlayerNamePage playerNamePage ) ->
             let
-                ( newPageModel, parentMsg ) =
-                    NewGamePage.update pageMsg pageModel
-
-                ( newPage, pageCmd ) =
-                    case ( parentMsg, model.playerName ) of
-                        ( Just NewGamePage.GoBack, _ ) ->
-                            let
-                                ( gameSelectionModel, gameSelectionCmd ) =
-                                    GameSelectionPage.init model.apiUrl
-                            in
-                            ( GameSelectionModel gameSelectionModel
-                            , Cmd.map GameSelectionMsg gameSelectionCmd
-                            )
-
-                        ( Just (NewGamePage.StartGame game), Just player1Name ) ->
-                            let (gameModel, gameCmd) =
-                                    GamePage.New player1Name game.player1Disc game.startingDisc 
-                                    |> GamePage.init
-                            in ( GameModel gameModel, Cmd.map GameMsg gameCmd )
-
-                        _ ->
-                            ( NewGameModel newPageModel, Cmd.none )
+                ( newPlayerNameModel, playerName ) =
+                    Pages.PlayerName.update playerNameMsg playerNamePage
             in
-            ( { model | page = newPage }
-            , pageCmd
-            )
+            case ( playerName, model.route ) of
+                ( Nothing, _ ) ->
+                    ( toModel PlayerNamePage newPlayerNameModel
+                    , Cmd.none
+                    )
+
+                ( Just newPlayerName, Route.Home ) ->
+                    let
+                        ( gameSelectionModel, gameSelectionCmd ) =
+                            Pages.GameSelection.init model.apiUrl
+                    in
+                    ( { model
+                        | playerName = Just newPlayerName
+                        , page = GameSelectionPage gameSelectionModel
+                      }
+                    , toCmd GameSelectionMsg gameSelectionCmd
+                    )
+
+                ( Just newPlayerName, Route.Game gameId ) ->
+                    let
+                        ( gameModel, gameCmd ) =
+                            Pages.Game.Join newPlayerName gameId
+                                |> Pages.Game.init
+                    in
+                    ( { model
+                        | playerName = Just newPlayerName
+                        , page = GamePage gameModel
+                      }
+                    , toCmd GameMsg gameCmd
+                    )
 
         _ ->
             ( model, Cmd.none )
 
 
-view : Model -> Browser.Document Msg
-view model =
-    let
-        renderPage toMsg { title, body } =
-            { title = title
-            , body = List.map (H.map toMsg) body
-            }
-    in
-    case model.page of
-        PlayerNameModel m ->
-            renderPage PlayerNameMsg (PlayerNamePage.view m)
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ReceivedPageMsg pageMsg ->
+            updatePage pageMsg model
 
-        GameSelectionModel m ->
-            renderPage GameSelectionMsg (GameSelectionPage.view m)
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model
+                    , Navigation.pushUrl model.navKey (Url.toString url)
+                    )
 
-        NewGameModel m ->
-            renderPage NewGameMsg (NewGamePage.view m)
+                Browser.External href ->
+                    ( model
+                    , Navigation.load href
+                    )
 
-        GameModel m ->
-            renderPage GameMsg (GamePage.view m)
+        UrlChanged url ->
+            ( { model | route = toRoute url }
+            , Cmd.none
+            )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.map (GameMsg >> ReceivedPageMsg) Pages.Game.subscriptions
 
 
 main : Program Flags Model Msg

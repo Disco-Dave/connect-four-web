@@ -6,10 +6,9 @@ import GameConnection
 import GameId exposing (GameId)
 import Html as H
 import Html.Attributes as A
-import Html.Events as E
-import Http
 import Json.Decode as Decode
 import PlayerName exposing (PlayerName)
+import Route
 
 
 type alias StartingDisc =
@@ -52,7 +51,6 @@ player2Disc { player1Disc } =
 
 type Msg
     = ReceivedEvent (Result Decode.Error GameConnection.Event)
-    | NoOp
 
 
 init : Init -> ( Model, Cmd Msg )
@@ -85,8 +83,10 @@ init initArgs =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update _ model =
-    ( model, Cmd.none )
+update msg model =
+    case msg of
+        _ ->
+            ( model, Cmd.none )
 
 
 subscriptions : Sub Msg
