@@ -177,50 +177,62 @@ type Event
     | GameUpdated Status Board
     | GameOver
     | NewReceived GameId Disc Status Board
+    | JoinFailed
     | JoinReceived GameId Disc Status Board PlayerName
 
 
 eventDecoder : Decoder Event
 eventDecoder =
-    Decode.field "_type" Decode.string
-        |> Decode.andThen
-            (\type_ ->
-                case type_ of
-                    "playerJoined" ->
-                        Decode.map PlayerJoined (Decode.field "playerName" PlayerName.decoder)
+    Decode.oneOf
+        [ Decode.field "_type" Decode.string
+            |> Decode.andThen
+                (\type_ ->
+                    case type_ of
+                        "playerJoined" ->
+                            Decode.map PlayerJoined (Decode.field "playerName" PlayerName.decoder)
 
-                    "playerLeft" ->
-                        Decode.map PlayerLeft (Decode.field "playerName" PlayerName.decoder)
+                        "playerLeft" ->
+                            Decode.map PlayerLeft (Decode.field "playerName" PlayerName.decoder)
 
-                    "gameUpdated" ->
-                        Decode.map2
-                            GameUpdated
-                            (Decode.field "status" statusDecoder)
-                            (Decode.field "board" boardDecoder)
+                        "gameUpdated" ->
+                            Decode.map2
+                                GameUpdated
+                                (Decode.field "status" statusDecoder)
+                                (Decode.field "board" boardDecoder)
 
-                    "gameOver" ->
-                        Decode.succeed GameOver
+                        "gameOver" ->
+                            Decode.succeed GameOver
 
-                    "newReceived" ->
-                        Decode.map4
-                            NewReceived
-                            (Decode.field "gameId" GameId.decoder)
-                            (Decode.field "yourDiscColor" Disc.decoder)
-                            (Decode.field "status" statusDecoder)
-                            (Decode.field "board" boardDecoder)
+                        "newReceived" ->
+                            Decode.map4
+                                NewReceived
+                                (Decode.field "gameId" GameId.decoder)
+                                (Decode.field "yourDiscColor" Disc.decoder)
+                                (Decode.field "status" statusDecoder)
+                                (Decode.field "board" boardDecoder)
 
-                    "joinReceived" ->
-                        Decode.map5
-                            JoinReceived
-                            (Decode.field "gameId" GameId.decoder)
-                            (Decode.field "yourDiscColor" Disc.decoder)
-                            (Decode.field "status" statusDecoder)
-                            (Decode.field "board" boardDecoder)
-                            (Decode.field "otherPlayerName" PlayerName.decoder)
+                        "joinReceived" ->
+                            Decode.map5
+                                JoinReceived
+                                (Decode.field "gameId" GameId.decoder)
+                                (Decode.field "yourDiscColor" Disc.decoder)
+                                (Decode.field "status" statusDecoder)
+                                (Decode.field "board" boardDecoder)
+                                (Decode.field "otherPlayerName" PlayerName.decoder)
 
-                    _ ->
-                        Decode.fail "Unrecognized \"_type\" for Status"
-            )
+                        _ ->
+                            Decode.fail "Unrecognized \"_type\" for Status"
+                )
+        , Decode.string
+            |> Decode.andThen
+                (\str ->
+                    if str == "Game not found." then
+                        Decode.succeed JoinFailed
+
+                    else
+                        Decode.fail "Unrecognized message"
+                )
+        ]
 
 
 subscribe : Sub (Result Decode.Error Event)

@@ -49,6 +49,10 @@ player2Disc { player1Disc } =
     Maybe.map Disc.opposite player1Disc
 
 
+type ParentMsg
+    = UpdateUrl GameId
+
+
 type Msg
     = ReceivedEvent (Result Decode.Error GameConnection.Event)
 
@@ -82,11 +86,17 @@ init initArgs =
             )
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe ParentMsg )
 update msg model =
     case msg of
+        ReceivedEvent (Ok (GameConnection.NewReceived gameId _ _ _)) ->
+            ( { model | gameId = Just gameId }
+            , Cmd.none
+            , Just (UpdateUrl gameId)
+            )
+
         _ ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, Nothing )
 
 
 subscriptions : Sub Msg

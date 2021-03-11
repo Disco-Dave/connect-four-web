@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
+import GameId exposing (GameId)
 import Html
 import Pages.Game
 import Pages.GameSelection
@@ -84,6 +85,18 @@ view model =
             renderPage GameMsg (Pages.Game.view m)
 
 
+joinGame : GameId -> PlayerName -> ( Page, Cmd Msg )
+joinGame gameId playerName =
+    let
+        ( gameModel, gameCmd ) =
+            Pages.Game.Join playerName gameId
+                |> Pages.Game.init
+    in
+    ( GamePage gameModel
+    , Cmd.map (GameMsg >> ReceivedPageMsg) gameCmd
+    )
+
+
 updatePage : PageMsg -> Model -> ( Model, Cmd Msg )
 updatePage pageMsg model =
     let
@@ -95,8 +108,24 @@ updatePage pageMsg model =
     in
     case ( pageMsg, model.page ) of
         ( GameMsg gameMsg, GamePage gameModel ) ->
-            Pages.Game.update gameMsg gameModel
-                |> Tuple.mapBoth (toModel GamePage) (toCmd GameMsg)
+            let
+                ( newGameModel, gameCmd, parentMsg ) =
+                    Pages.Game.update gameMsg gameModel
+
+                cmd =
+                    case parentMsg of
+                        Nothing ->
+                            gameCmd
+
+                        Just (Pages.Game.UpdateUrl gameId) ->
+                            Cmd.batch
+                                [ Route.replace model.navKey (Route.Game gameId)
+                                , gameCmd
+                                ]
+            in
+            ( toModel GamePage newGameModel
+            , toCmd GameMsg cmd
+            )
 
         ( GameSelectionMsg gameSelectionMsg, GameSelectionPage gameSelectionPage ) ->
             let
@@ -179,15 +208,14 @@ updatePage pageMsg model =
 
                 ( Just newPlayerName, Route.Game gameId ) ->
                     let
-                        ( gameModel, gameCmd ) =
-                            Pages.Game.Join newPlayerName gameId
-                                |> Pages.Game.init
+                        ( page, cmd ) =
+                            joinGame gameId newPlayerName
                     in
                     ( { model
                         | playerName = Just newPlayerName
-                        , page = GamePage gameModel
+                        , page = page
                       }
-                    , toCmd GameMsg gameCmd
+                    , cmd
                     )
 
         _ ->
@@ -213,8 +241,35 @@ update msg model =
                     )
 
         UrlChanged url ->
-            ( { model | route = toRoute url }
-            , Cmd.none
+            let
+                route =
+                    toRoute url
+
+                currentGameId =
+                    case model.page of
+                        GamePage game ->
+                            game.gameId
+
+                        _ ->
+                            Nothing
+
+                ( page, cmd ) =
+                    case ( route, model.playerName ) of
+                        ( Route.Game gameId, Just playerName ) ->
+                            if Just gameId /= currentGameId then
+                                joinGame gameId playerName
+
+                            else
+                                ( model.page, Cmd.none )
+
+                        _ ->
+                            ( model.page, Cmd.none )
+            in
+            ( { model
+                | route = toRoute url
+                , page = page
+              }
+            , cmd
             )
 
 
