@@ -14,8 +14,6 @@ function close() {
   }
 }
 
-console.log(app.ports);
-
 //app.ports?.close.subscribe(close);
 
 app.ports?.connect.subscribe((message) => {
@@ -32,8 +30,8 @@ app.ports?.connect.subscribe((message) => {
   };
 });
 
-//app.ports?.send.subscribe((message) => {
-  //if (connection && connection.send) {
-    //connection.send(message);
-  //}
-//});
+app.ports?.send.subscribe((message) => {
+  if (connection && connection.send) {
+    connection.send(message);
+  }
+});

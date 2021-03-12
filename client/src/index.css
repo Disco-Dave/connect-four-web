@@ -249,3 +249,42 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.board {
+  background-color: var(--nord-frost-4);
+  display: flex;
+  justify-content: space-evenly;
+  padding: 1rem;
+}
+
+.board__column {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.board__column:active {
+  padding: 0;
+}
+
+.board__row {
+  height: 2rem;
+  width: 2rem;
+  background-color: var(--nord-polar-night-1);
+  border-radius: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.board__row:last-of-type {
+  margin-bottom: 0;
+}
+
+.board__row--red {
+  background-color: var(--nord-aurora-red);
+}
+
+.board__row--yellow {
+  background-color: var(--nord-aurora-yellow);
+}

@@ -248,7 +248,7 @@ update msg model =
                 currentGameId =
                     case model.page of
                         GamePage game ->
-                            game.gameId
+                            Pages.Game.getGameId game
 
                         _ ->
                             Nothing
