@@ -252,39 +252,36 @@ body {
 
 .board {
   background-color: var(--nord-frost-4);
-  display: flex;
-  justify-content: space-evenly;
-  padding: 1rem;
+  padding: 5%;
+  padding-bottom: 13%;
+  border-radius: 0.125rem;
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
+  grid-gap: 2.5%;
 }
 
-.board__column {
-  background: none;
+
+.board__slot {
+  width: 100%;
+  background-color: var(--nord-polar-night-1);
   border: none;
-  cursor: pointer;
+  border-radius: 100%;
   padding: 0;
   margin: 0;
+  cursor: pointer;
 }
 
-.board__column:active {
-  padding: 0;
+.board__slot::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
 }
 
-.board__row {
-  height: 2rem;
-  width: 2rem;
-  background-color: var(--nord-polar-night-1);
-  border-radius: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.board__row:last-of-type {
-  margin-bottom: 0;
-}
-
-.board__row--red {
+.board__slot--red {
   background-color: var(--nord-aurora-red);
 }
 
-.board__row--yellow {
+.board__slot--yellow {
   background-color: var(--nord-aurora-yellow);
 }

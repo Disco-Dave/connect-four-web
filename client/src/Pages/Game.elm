@@ -190,40 +190,37 @@ subscriptions =
 viewBoard : GameConnection.Board -> H.Html Msg
 viewBoard board =
     let
-        viewRow disc =
+        viewSlot row column move =
             let
-                discColor =
-                    case disc of
-                        Just Disc.RedDisc ->
-                            " board__row--red"
+                disc =
+                    board
+                        |> column
+                        |> row
 
-                        Just Disc.YellowDisc ->
-                            " board__row--yellow"
-
-                        _ ->
-                            ""
+                css =
+                    A.classList
+                        [ ( "board__slot", True )
+                        , ( "board__slot--red", disc == Just Disc.RedDisc )
+                        , ( "board__slot--yellow", disc == Just Disc.YellowDisc )
+                        ]
             in
-            H.div [ A.class ("board__row" ++ discColor) ] []
+            H.button [ css, E.onClick (MovePlayed move) ] []
 
-        viewColumn column move =
-            H.button [ A.class "board__column", E.onClick (MovePlayed move) ]
-                [ viewRow column.row6
-                , viewRow column.row5
-                , viewRow column.row4
-                , viewRow column.row3
-                , viewRow column.row2
-                , viewRow column.row1
-                ]
+        viewRow row =
+            [ viewSlot row .column1 GameConnection.DropIntoColumnOne
+            , viewSlot row .column2 GameConnection.DropIntoColumnTwo
+            , viewSlot row .column3 GameConnection.DropIntoColumnThree
+            , viewSlot row .column4 GameConnection.DropIntoColumnFour
+            , viewSlot row .column5 GameConnection.DropIntoColumnFive
+            , viewSlot row .column6 GameConnection.DropIntoColumnSix
+            , viewSlot row .column7 GameConnection.DropIntoColumnSeven
+            ]
+
+        boardView =
+            [ .row6, .row5, .row4, .row3, .row2, .row1 ]
+                |> List.concatMap viewRow
     in
-    H.div [ A.class "board" ]
-        [ viewColumn board.column1 GameConnection.DropIntoColumnOne
-        , viewColumn board.column2 GameConnection.DropIntoColumnTwo
-        , viewColumn board.column3 GameConnection.DropIntoColumnThree
-        , viewColumn board.column4 GameConnection.DropIntoColumnFour
-        , viewColumn board.column5 GameConnection.DropIntoColumnFive
-        , viewColumn board.column6 GameConnection.DropIntoColumnSix
-        , viewColumn board.column7 GameConnection.DropIntoColumnSeven
-        ]
+    H.div [ A.class "board" ] boardView
 
 
 view : Model -> Browser.Document Msg
