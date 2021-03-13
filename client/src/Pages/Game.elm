@@ -1,4 +1,16 @@
-module Pages.Game exposing (..)
+module Pages.Game exposing
+    ( Init(..)
+    , Model
+    , Msg
+    , ParentMsg(..)
+    , Player1Disc
+    , StartingDisc
+    , getGameId
+    , init
+    , subscriptions
+    , update
+    , view
+    )
 
 import Browser
 import Disc exposing (Disc(..))
@@ -45,15 +57,18 @@ type Model
     = Pending Init
     | Single SinglePlayerGame
     | Connected ConnectedGame
+    | OtherPlayerLeft ConnectedGame
 
 
 type ParentMsg
     = UpdateUrl GameId
+    | GoBack
 
 
 type Msg
     = ReceivedEvent (Result Decode.Error GameConnection.Event)
     | MovePlayed GameConnection.Move
+    | LeaveButtonClicked
 
 
 getGameId : Model -> Maybe GameId
@@ -62,27 +77,82 @@ getGameId model =
         Pending (Join _ gameId) ->
             Just gameId
 
+        Pending (New _ _ _) ->
+            Nothing
+
         Single { gameId } ->
             Just gameId
 
         Connected { gameId } ->
             Just gameId
 
-        _ ->
-            Nothing
+        OtherPlayerLeft { gameId } ->
+            Just gameId
 
 
-getBoard : Model -> Maybe GameConnection.Board
+getBoard : Model -> GameConnection.Board
 getBoard model =
     case model of
         Single { board } ->
-            Just board
+            board
 
         Connected { board } ->
-            Just board
+            board
+
+        OtherPlayerLeft { board } ->
+            board
 
         _ ->
+            let
+                emptyColumn =
+                    { row1 = Nothing
+                    , row2 = Nothing
+                    , row3 = Nothing
+                    , row4 = Nothing
+                    , row5 = Nothing
+                    , row6 = Nothing
+                    }
+            in
+            { column1 = emptyColumn
+            , column2 = emptyColumn
+            , column3 = emptyColumn
+            , column4 = emptyColumn
+            , column5 = emptyColumn
+            , column6 = emptyColumn
+            , column7 = emptyColumn
+            }
+
+
+getDiscColor : Model -> Maybe Disc
+getDiscColor model =
+    case model of
+        Pending _ ->
             Nothing
+
+        Single { myDiscColor } ->
+            Just myDiscColor
+
+        Connected { myDiscColor } ->
+            Just myDiscColor
+
+        OtherPlayerLeft { myDiscColor } ->
+            Just myDiscColor
+
+
+getStatus : Model -> Maybe GameConnection.Status
+getStatus model =
+    case model of
+        Pending _ ->
+            Nothing
+
+        Single { status } ->
+            Just status
+
+        Connected { status } ->
+            Just status
+
+        OtherPlayerLeft { status } ->
+            Just status
 
 
 init : Init -> ( Model, Cmd Msg )
@@ -166,6 +236,18 @@ update msg model =
             in
             ( newModel, Cmd.none, Nothing )
 
+        ReceivedEvent (Ok (GameConnection.PlayerLeft _)) ->
+            let
+                newModel =
+                    case model of
+                        Connected connected ->
+                            OtherPlayerLeft connected
+
+                        _ ->
+                            model
+            in
+            ( newModel, Cmd.none, Nothing )
+
         MovePlayed move ->
             let
                 cmd =
@@ -177,6 +259,9 @@ update msg model =
                             Cmd.none
             in
             ( model, cmd, Nothing )
+
+        LeaveButtonClicked ->
+            ( model, GameConnection.close (), Just GoBack )
 
         _ ->
             ( model, Cmd.none, Nothing )
@@ -228,14 +313,81 @@ view model =
     let
         board =
             getBoard model
-                |> Maybe.map viewBoard
-                |> Maybe.withDefault (H.text "")
+                |> viewBoard
+
+        title =
+            case model of
+                Pending _ ->
+                    "Connecting..."
+
+                Single _ ->
+                    "Waiting for other player"
+
+                OtherPlayerLeft game ->
+                    PlayerName.toString game.otherPlayerName ++ " left"
+
+                Connected game ->
+                    case game.status of
+                        GameConnection.WaitingFor _ ->
+                            "Playing with " ++ PlayerName.toString game.otherPlayerName
+
+                        GameConnection.Tie ->
+                            "Tied with " ++ PlayerName.toString game.otherPlayerName
+
+                        GameConnection.Win disc ->
+                            if disc == game.myDiscColor then
+                                "You won against " ++ PlayerName.toString game.otherPlayerName
+
+                            else
+                                "You lost against " ++ PlayerName.toString game.otherPlayerName
+
+        yourDiscColor =
+            case getDiscColor model of
+                Nothing ->
+                    H.text ""
+
+                Just disc ->
+                    H.h2 [ A.class "title title--small" ]
+                        [ H.text "You are "
+                        , case disc of
+                            Disc.RedDisc ->
+                                H.span [ A.class "red" ] [ H.text "Red" ]
+
+                            Disc.YellowDisc ->
+                                H.span [ A.class "yellow" ] [ H.text "Yellow" ]
+                        ]
+
+        waitingFor =
+            case getStatus model of
+                Just (GameConnection.WaitingFor disc) ->
+                    H.h2 [ A.class "title title--small" ]
+                        [ H.text "Waiting for "
+                        , case disc of
+                            Disc.RedDisc ->
+                                H.span [ A.class "red" ] [ H.text "Red" ]
+
+                            Disc.YellowDisc ->
+                                H.span [ A.class "yellow" ] [ H.text "Yellow" ]
+                        ]
+
+                _ ->
+                    H.text ""
     in
-    { title = "Connect Four - New Game"
+    { title = "Connect Four - " ++ title
     , body =
         [ H.main_ [ A.class "main" ]
-            [ H.h1 [ A.class "title" ] [ H.text "TODO" ]
+            [ H.div [ A.class "title-group" ]
+                [ H.h1 [ A.class "title" ] [ H.text title ]
+                , yourDiscColor
+                , waitingFor
+                ]
             , board
+            , H.button
+                [ A.class "button button--danger"
+                , A.type_ "button"
+                , E.onClick LeaveButtonClicked
+                ]
+                [ H.text "Leave" ]
             ]
         ]
     }

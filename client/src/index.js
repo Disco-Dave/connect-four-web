@@ -14,7 +14,7 @@ function close() {
   }
 }
 
-//app.ports?.close.subscribe(close);
+app.ports?.close.subscribe(close);
 
 app.ports?.connect.subscribe((message) => {
   close();

@@ -136,7 +136,7 @@ handleJoinGame :: GameId -> PlayerName -> GameRepo -> WebSockets.Connection -> I
 handleJoinGame gameId playerName repo conn =
   GameRepo.joinGame gameId playerName repo $ \case
     Nothing ->
-      WebSockets.sendTextData @Text conn "Game not found."
+      WebSockets.sendTextData @Text conn "\"Game not found.\""
     Just (otherPlayerName, disc, ctx) -> do
       let Context getGame receive send = ctx
       game <- getGame

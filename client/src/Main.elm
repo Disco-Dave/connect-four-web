@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
@@ -111,21 +111,32 @@ updatePage pageMsg model =
             let
                 ( newGameModel, gameCmd, parentMsg ) =
                     Pages.Game.update gameMsg gameModel
-
-                cmd =
-                    case parentMsg of
-                        Nothing ->
-                            gameCmd
-
-                        Just (Pages.Game.UpdateUrl gameId) ->
-                            Cmd.batch
-                                [ Route.replace model.navKey (Route.Game gameId)
-                                , gameCmd
-                                ]
             in
-            ( toModel GamePage newGameModel
-            , toCmd GameMsg cmd
-            )
+            case parentMsg of
+                Nothing ->
+                    ( toModel GamePage newGameModel
+                    , toCmd GameMsg gameCmd
+                    )
+
+                Just (Pages.Game.UpdateUrl gameId) ->
+                    ( toModel GamePage newGameModel
+                    , Cmd.batch
+                        [ Route.replace model.navKey (Route.Game gameId)
+                        , toCmd GameMsg gameCmd
+                        ]
+                    )
+
+                Just Pages.Game.GoBack ->
+                    let
+                        ( gameSelectionModel, gameSelectionCmd ) =
+                            Pages.GameSelection.init model.apiUrl
+                    in
+                    ( toModel GameSelectionPage gameSelectionModel
+                    , Cmd.batch
+                        [ toCmd GameMsg gameCmd
+                        , toCmd GameSelectionMsg gameSelectionCmd
+                        ]
+                    )
 
         ( GameSelectionMsg gameSelectionMsg, GameSelectionPage gameSelectionPage ) ->
             let
