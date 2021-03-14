@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
+import GameConnection
 import GameId exposing (GameId)
 import Html
 import Pages.Game
@@ -111,32 +112,21 @@ updatePage pageMsg model =
             let
                 ( newGameModel, gameCmd, parentMsg ) =
                     Pages.Game.update gameMsg gameModel
+
+                extraCmds =
+                    case parentMsg of
+                        Nothing ->
+                            []
+
+                        Just (Pages.Game.UpdateUrl gameId) ->
+                            [ Route.push model.navKey (Route.Game gameId) ]
+
+                        Just Pages.Game.GoBack ->
+                            [ Route.push model.navKey Route.Home ]
             in
-            case parentMsg of
-                Nothing ->
-                    ( toModel GamePage newGameModel
-                    , toCmd GameMsg gameCmd
-                    )
-
-                Just (Pages.Game.UpdateUrl gameId) ->
-                    ( toModel GamePage newGameModel
-                    , Cmd.batch
-                        [ Route.replace model.navKey (Route.Game gameId)
-                        , toCmd GameMsg gameCmd
-                        ]
-                    )
-
-                Just Pages.Game.GoBack ->
-                    let
-                        ( gameSelectionModel, gameSelectionCmd ) =
-                            Pages.GameSelection.init model.apiUrl
-                    in
-                    ( toModel GameSelectionPage gameSelectionModel
-                    , Cmd.batch
-                        [ toCmd GameMsg gameCmd
-                        , toCmd GameSelectionMsg gameSelectionCmd
-                        ]
-                    )
+            ( toModel GamePage newGameModel
+            , Cmd.batch (toCmd GameMsg gameCmd :: extraCmds)
+            )
 
         ( GameSelectionMsg gameSelectionMsg, GameSelectionPage gameSelectionPage ) ->
             let
@@ -272,6 +262,23 @@ update msg model =
 
                             else
                                 ( model.page, Cmd.none )
+
+                        ( Route.Home, Just _ ) ->
+                            let
+                                ( gameSelectionModel, gameSelectionCmd ) =
+                                    Pages.GameSelection.init model.apiUrl
+                            in
+                            ( GameSelectionPage gameSelectionModel
+                            , Cmd.batch
+                                [ GameConnection.close ()
+                                , Cmd.map (GameSelectionMsg >> ReceivedPageMsg) gameSelectionCmd
+                                ]
+                            )
+
+                        ( Route.Home, Nothing ) ->
+                            ( PlayerNamePage Pages.PlayerName.init
+                            , GameConnection.close ()
+                            )
 
                         _ ->
                             ( model.page, Cmd.none )

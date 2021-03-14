@@ -327,19 +327,7 @@ view model =
                     PlayerName.toString game.otherPlayerName ++ " left"
 
                 Connected game ->
-                    case game.status of
-                        GameConnection.WaitingFor _ ->
-                            "Playing with " ++ PlayerName.toString game.otherPlayerName
-
-                        GameConnection.Tie ->
-                            "Tied with " ++ PlayerName.toString game.otherPlayerName
-
-                        GameConnection.Win disc ->
-                            if disc == game.myDiscColor then
-                                "You won against " ++ PlayerName.toString game.otherPlayerName
-
-                            else
-                                "You lost against " ++ PlayerName.toString game.otherPlayerName
+                    "Playing with " ++ PlayerName.toString game.otherPlayerName
 
         yourDiscColor =
             case getDiscColor model of
@@ -357,7 +345,7 @@ view model =
                                 H.span [ A.class "yellow" ] [ H.text "Yellow" ]
                         ]
 
-        waitingFor =
+        status =
             case getStatus model of
                 Just (GameConnection.WaitingFor disc) ->
                     H.h2 [ A.class "title title--small" ]
@@ -370,7 +358,20 @@ view model =
                                 H.span [ A.class "yellow" ] [ H.text "Yellow" ]
                         ]
 
-                _ ->
+                Just GameConnection.Tie ->
+                    H.h2 [ A.class "title title--small" ]
+                        [ H.text "You tied" ]
+
+                Just (GameConnection.Win disc) ->
+                    if Just disc == getDiscColor model then
+                        H.h2 [ A.class "title title--small" ]
+                            [ H.text "You won" ]
+
+                    else
+                        H.h2 [ A.class "title title--small" ]
+                            [ H.text "You lost" ]
+
+                Nothing ->
                     H.text ""
     in
     { title = "Connect Four - " ++ title
@@ -379,7 +380,7 @@ view model =
             [ H.div [ A.class "title-group" ]
                 [ H.h1 [ A.class "title" ] [ H.text title ]
                 , yourDiscColor
-                , waitingFor
+                , status
                 ]
             , board
             , H.button
