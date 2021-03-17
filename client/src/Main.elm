@@ -10,7 +10,7 @@ import Pages.GameSelection
 import Pages.NewGame
 import Pages.PlayerName
 import PlayerName exposing (PlayerName)
-import Route exposing (Route, BasePath)
+import Route exposing (BasePath, Route)
 import Url exposing (Url)
 
 
@@ -81,7 +81,7 @@ view model =
             renderPage PlayerNameMsg (Pages.PlayerName.view m)
 
         GameSelectionPage m ->
-            renderPage GameSelectionMsg (Pages.GameSelection.view m)
+            renderPage GameSelectionMsg (Pages.GameSelection.view model.basePath m)
 
         NewGamePage m ->
             renderPage NewGameMsg (Pages.NewGame.view m)

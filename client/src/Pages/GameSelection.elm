@@ -16,6 +16,7 @@ import Html.Events as E
 import Http
 import Json.Decode as Decode
 import PlayerName exposing (PlayerName)
+import Route as Route exposing (BasePath)
 
 
 type alias PendingGame =
@@ -104,11 +105,11 @@ update apiUrl msg model =
             ( model, Cmd.none, Just NewGame )
 
 
-viewGame : PendingGame -> H.Html Msg
-viewGame game =
+viewGame : BasePath -> PendingGame -> H.Html Msg
+viewGame basePath game =
     H.div [ A.class "pending-game" ]
         [ H.a
-            [ A.class "pending-game__join", A.href (GameId.toString game.gameId) ]
+            [ A.class "pending-game__join", A.href (Route.toString basePath (Route.Game game.gameId)) ]
             [ H.text "Join" ]
         , H.h2
             [ A.class "pending-game__player" ]
@@ -116,8 +117,8 @@ viewGame game =
         ]
 
 
-viewGames : PendingGames -> List (H.Html Msg)
-viewGames pendingGames =
+viewGames : BasePath -> PendingGames -> List (H.Html Msg)
+viewGames basePath pendingGames =
     case pendingGames of
         PendingGamesNotLoaded ->
             []
@@ -139,11 +140,11 @@ viewGames pendingGames =
                 _ ->
                     loadedGames
                         |> List.sortBy (.player1Name >> PlayerName.toString)
-                        |> List.map viewGame
+                        |> List.map (viewGame basePath)
 
 
-view : Model -> Browser.Document Msg
-view model =
+view : BasePath -> Model -> Browser.Document Msg
+view basePath model =
     { title = "Connect Four - Select a game"
     , body =
         [ H.main_ [ A.class "main main--full-height" ]
@@ -151,7 +152,7 @@ view model =
             , H.div [ A.class "games" ]
                 [ H.div
                     [ A.classList [ ( "available-games", True ), ( "loading", isLoading model ) ] ]
-                    (viewGames model)
+                    (viewGames basePath model)
                 , H.button
                     [ A.class "button button--danger"
                     , A.type_ "button"

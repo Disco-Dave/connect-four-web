@@ -1,4 +1,4 @@
-module Route exposing (BasePath, Route(..), parse, push, replace)
+module Route exposing (BasePath, Route(..), parse, push, replace, toString)
 
 import Browser.Navigation as Navigation
 import GameId exposing (GameId)
