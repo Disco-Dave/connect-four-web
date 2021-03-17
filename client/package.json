@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "serve": "rm -rf .parcel/serve && parcel -p 1234 --cache-dir .parcel/cache -d .parcel/serve src/index.html",
-    "bundle": "rm -rf dist && parcel build --no-source-maps --cache-dir .parcel/cache -d dist src/index.html"
+    "bundle": "rm -rf dist && parcel build --no-source-maps --cache-dir .parcel/cache -d dist --public-url http://wwww.davidburkett.xyz/connect-four src/index.html"
   },
   "keywords": [],
   "author": "",

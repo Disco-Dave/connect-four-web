@@ -1,0 +1,10 @@
+
+version: "3.8"
+
+services:
+  web-server:
+    build: .
+    environment:
+      - CONNECT_FOUR_WEB_PORT=${CONNECT_FOUR_WEB_PORT:-5001}
+    ports:
+      - "${CONNECT_FOUR_WEB_PORT:-5001}:${CONNECT_FOUR_WEB_PORT:-5001}"

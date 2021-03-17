@@ -10,12 +10,14 @@ import Pages.GameSelection
 import Pages.NewGame
 import Pages.PlayerName
 import PlayerName exposing (PlayerName)
-import Route exposing (Route)
+import Route exposing (Route, BasePath)
 import Url exposing (Url)
 
 
 type alias Flags =
-    String
+    { apiUrl : String
+    , basePath : String
+    }
 
 
 type Page
@@ -30,6 +32,7 @@ type alias Model =
     , route : Route
     , playerName : Maybe PlayerName
     , apiUrl : String
+    , basePath : String
     , navKey : Navigation.Key
     }
 
@@ -47,17 +50,18 @@ type Msg
     | ReceivedPageMsg PageMsg
 
 
-toRoute : Url -> Route
-toRoute =
-    Route.parse >> Maybe.withDefault Route.Home
+toRoute : BasePath -> Url -> Route
+toRoute basePath =
+    Route.parse basePath >> Maybe.withDefault Route.Home
 
 
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
-init apiUrl url navKey =
+init flags url navKey =
     ( { page = PlayerNamePage Pages.PlayerName.init
-      , route = toRoute url
+      , route = toRoute flags.basePath url
       , playerName = Nothing
-      , apiUrl = apiUrl
+      , apiUrl = flags.apiUrl
+      , basePath = flags.basePath
       , navKey = navKey
       }
     , Cmd.none
@@ -119,10 +123,10 @@ updatePage pageMsg model =
                             []
 
                         Just (Pages.Game.UpdateUrl gameId) ->
-                            [ Route.push model.navKey (Route.Game gameId) ]
+                            [ Route.push model.navKey model.basePath (Route.Game gameId) ]
 
                         Just Pages.Game.GoBack ->
-                            [ Route.push model.navKey Route.Home ]
+                            [ Route.push model.navKey model.basePath Route.Home ]
             in
             ( toModel GamePage newGameModel
             , Cmd.batch (toCmd GameMsg gameCmd :: extraCmds)
@@ -244,7 +248,7 @@ update msg model =
         UrlChanged url ->
             let
                 route =
-                    toRoute url
+                    toRoute model.basePath url
 
                 currentGameId =
                     case model.page of
@@ -284,7 +288,7 @@ update msg model =
                             ( model.page, Cmd.none )
             in
             ( { model
-                | route = toRoute url
+                | route = toRoute model.basePath url
                 , page = page
               }
             , cmd

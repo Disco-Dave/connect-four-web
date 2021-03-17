@@ -2,8 +2,14 @@ import {Elm} from './Main.elm';
 
 const apiUrl = process.env.CONNECT_FOUR_WEB_URL;
 const socketUrl = process.env.CONNECT_FOUR_SOCKET_URL;
+const basePath = process.env.CONNECT_FOUR_BASE_PATH ?? '';
 
-const app = Elm.Main.init({flags: apiUrl});
+const app = Elm.Main.init({
+  flags: {
+    apiUrl,
+    basePath,
+  },
+});
 
 let connection = null;
 
