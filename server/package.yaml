@@ -57,7 +57,6 @@ executables:
       ld-options:
       - -static
       - -pthread
-      - --verbose
 
 tests:
   connect-four-web-test:
