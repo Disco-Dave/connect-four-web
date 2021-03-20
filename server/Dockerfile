@@ -1,7 +1,8 @@
 FROM alpine:3.13
 
-RUN echo "Installing system dependencies for ghcup" &&\
+RUN echo "Installing system dependencies" &&\
     apk --no-cache add \
+        bash \
         binutils-gold \
         curl \
         g++ \
@@ -11,6 +12,7 @@ RUN echo "Installing system dependencies for ghcup" &&\
         make \
         ncurses-dev \
         perl \
+        shadow \
         tar \
         xz
 
@@ -29,14 +31,7 @@ RUN echo "Downloading and installing ghc $GHC_VERSION" &&\
     ghcup install ghc --set $GHC_VERSION
 
 
-RUN echo "Installing system dependencies for stack's docker integration" &&\
-    apk --no-cache add \
-        bash \
-        shadow
-
-
 RUN echo "Installing system dependencies for project" &&\
     apk --no-cache add \
         zlib-dev \
         zlib-static
-
