@@ -52,6 +52,12 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - connect-four-web
+    when:
+    - condition: flag(static)
+      ld-options:
+      - -static
+      - -pthread
+      - --verbose
 
 tests:
   connect-four-web-test:
@@ -68,3 +74,9 @@ tests:
       - connect-four-web
       - hspec
       - http-client
+
+flags:
+  static:
+    description: Pass -static/-pthread to ghc when linking the connect-four-web-exe binary.
+    manual: true
+    default: false

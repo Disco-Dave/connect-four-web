@@ -41,24 +41,20 @@ FROM build_base as build
 RUN echo "Installing system dependencies for project" &&\
     apk --no-cache add \
         binutils-gold \
-        zlib-dev
+        zlib-dev \
+        zlib-static
 
 COPY stack.yaml stack.yaml.lock package.yaml ./
 RUN echo "Compiling haskell dependencies for project" &&\
-    stack --system-ghc build --only-dependencies
+    stack --system-ghc --no-install-ghc build --only-dependencies
 
 COPY . ./
 RUN echo "Compiling haskell project" &&\
-    stack --system-ghc install --local-bin-path .
+    stack --system-ghc --no-install-ghc install --flag connect-four-web:static --local-bin-path .
 
 
 FROM alpine:3.13
 
 COPY --from=build /connect-four-web-exe /connect-four-web-exe
-
-RUN echo "Installing runtime dependencies" &&\
-    apk --no-cache add \
-        zlib-dev \
-        gmp-dev
 
 CMD /connect-four-web-exe
