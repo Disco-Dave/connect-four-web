@@ -1,0 +1,9 @@
+.stack-work
+.gitignore
+CHANGELOG.md
+connect-four-web.cabal
+docker-compose.yml
+Dockerfile
+hie.yaml
+LICENSE
+bin
